@@ -19,6 +19,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/IterativeLinearSolvers>
+#include <chrono>
 
 #define PROJECT_DIR std::string(PROJECT_DIR_RAW)
 
@@ -33,47 +34,55 @@ template<int size>
 using MatrixSqD = Eigen::Matrix<double, size, size>;
 template<int size>
 using MatrixSqC = Eigen::Matrix<complex, size, size>;
+using bits = std::vector<bool>;
 
 using namespace std::complex_literals;
 
 template<uint constellationOrder>
 using constellation = std::unordered_map<std::bitset<constellationOrder>, iqPoint>;
 
-template<uint n>
-double estimateBER(const std::bitset<n> &b1, const std::bitset<n> &b2)
+double estimateBER(const bits &refBits, const bits &distBits)
 {
+	if (((refBits.size() - distBits.size()) % 2) != 0)
+		throw std::runtime_error("Bad dimensions");
+	const uint n = distBits.size();
+	const uint referenceShift = (refBits.size() - distBits.size()) / 2;
 	uint errSum = 0;
-	for (uint i = 0; i < n; ++i)
-		errSum += b1[i] != b2[i];
+	for (uint idx = 0; idx < n; ++idx)
+		errSum += (refBits[idx + referenceShift] == distBits[idx]) ? 0 : 1;
 	return static_cast<double>(errSum) / static_cast<double>(n);
+
 }
 
 double NMSE_metrics(const iqPoints &referenceSignal, const iqPoints &distortedSignal, const uint nExclude = 0)
 {
-	if (referenceSignal.size() != distortedSignal.size())
+	if (((referenceSignal.size() - distortedSignal.size()) % 2) != 0)
+		throw std::runtime_error("Bad signal dimensions");
+	if (referenceSignal.size() < distortedSignal.size())
 		throw std::runtime_error("Bad signal dimensions");
 	if (referenceSignal.empty() || distortedSignal.empty())
 		throw std::runtime_error("Vectors should be non-empty");
-
-	const uint n = referenceSignal.size();
+	const uint n = distortedSignal.size();
+	const uint referenceShift = (referenceSignal.size() - distortedSignal.size()) / 2;
 
 	double norm = 0;
 	double diff = 0;
-	for (uint idx = nExclude; idx < n-nExclude; ++idx)
+	for (uint idx = nExclude; idx < n - nExclude; ++idx)
 	{
-		diff += std::pow(std::abs(distortedSignal[idx] - referenceSignal[idx]), 2);
-		norm += std::pow(std::abs(distortedSignal[idx]), 2);
+		diff += std::pow(std::abs(distortedSignal[idx] - referenceSignal[idx + referenceShift]), 2);
+		norm += std::pow(std::abs(referenceSignal[idx]), 2);
 	}
 	return 10. * std::log10(diff / norm);
 }
 
 double
-NMSE_metrics(const std::vector<iqPoints> &referenceSignal, const std::vector<iqPoints> &distortedSignal, const uint nExclude = 0)
+NMSE_metrics(const iqPoints2Pol &referenceSignal, const iqPoints2Pol &distortedSignal,
+			 const uint nExclude = 0)
 {
 	const uint N = referenceSignal.size();
 	DoubleVector results(N);
 	for (uint idx = 0; idx < N; ++idx)
-		results[idx] = NMSE_metrics(referenceSignal[idx], distortedSignal[idx],nExclude);
+		results[idx] = NMSE_metrics(referenceSignal[idx], distortedSignal[idx], nExclude);
 	double tmp = 0;
 	for (uint idx = 0; idx < N; ++idx)
 		tmp += std::pow(10., results[idx] * 0.1);
@@ -139,10 +148,10 @@ iqPoint getFromIdx(const iqPoints &vec, const int idx)
 	const uint max = vec.size();
 	if (idx >= 0 && idx < max)
 		return vec[idx];
-	else if (idx < 0)
-		return vec[0];
-	else if (idx >= max)
-		return vec[max - 1];
+//	else if (idx < 0)
+//		return vec[0];
+//	else if (idx >= max)
+//		return vec[max - 1];
 	else throw std::runtime_error("wtf just happened");
 }
 
@@ -152,7 +161,7 @@ Eigen::MatrixX<T> regularized(Eigen::MatrixX<T> matrix)
 	int N = matrix.rows();
 	double power = 0;
 	for (uint i = 0; i < N; ++i)
-		power += std::abs(matrix(i, i));
+		power += std::pow(std::abs(matrix(i, i)), 2);
 	power /= N;
 	power = std::sqrt(power);
 	for (uint i = 0; i < N; ++i)
@@ -160,81 +169,75 @@ Eigen::MatrixX<T> regularized(Eigen::MatrixX<T> matrix)
 	return matrix;
 }
 
-template<int averagingBlockSize, int M>
-iqPoints2Pol calcCoeffVector(const iqPoints2Pol &refSym, const iqPoints2Pol &distSym)
+iqPoints2Pol restorationModel(const iqPoints2Pol &refSym, const iqPoints2Pol &distSym, const int M)
 {
-	if (distSym[0].size() % averagingBlockSize != 0) throw std::runtime_error("Incorrect dimension");
-	constexpr int blockSize = 2 * M + 1;
-	const uint N = distSym[0].size();
-	Eigen::MatrixXcd Ux(averagingBlockSize, 2 * blockSize * blockSize), Uy(averagingBlockSize,
-																		   2 * blockSize * blockSize);
-//    Eigen::Vector<complex, 2 * blockSize * blockSize> cx, cy;
-	Eigen::VectorXcd cx(2 * blockSize * blockSize), cy(2 * blockSize * blockSize);
-//    Eigen::Vector<complex, averagingBlockSize> dx, dy;
-	Eigen::VectorXcd dx(averagingBlockSize), dy(averagingBlockSize);
-	iqPoints yx(distSym[0].size()), yy(distSym[0].size());
-	for (uint averagingBlockIdx = 0; averagingBlockIdx < N / averagingBlockSize; ++averagingBlockIdx)
+	if (distSym[0].size() % distSym[0].size() != 0) throw std::runtime_error("Incorrect dimension");
+	const int blockSize = 2 * M + 1;
+	const int matrixSize = 2 * blockSize * blockSize;
+	const int exclusionN = 2 * M;
+	const int N = distSym[0].size() - 2 * exclusionN;
+	Eigen::MatrixXcd Ux(N, matrixSize), Uy(N, matrixSize);
+	Eigen::VectorXcd cx(matrixSize), cy(matrixSize);
+	Eigen::VectorXcd dx(N), dy(N);
+	iqPoints yx(N), yy(N);
+
+	//region Create Ux, Uy
+	for (int k = 0; k < N; ++k)
 	{
-		//region Create Ux, Uy
-		for (int k = 0; k < averagingBlockSize; ++k)
-		{
-			for (int m = -M; m <= M; ++m)
-				for (int n = -M; n <= M; ++n)
-				{
-					Ux(k, M + n + (M + m) * blockSize) =
-							getFromIdx(distSym[0], k + averagingBlockIdx * averagingBlockSize + m) *
-							getFromIdx(distSym[0], k + averagingBlockIdx * averagingBlockSize + n) *
-							std::conj(getFromIdx(distSym[0],
-												 k + averagingBlockIdx * averagingBlockSize + n + m));
-					Ux(k, blockSize * blockSize + M + n + (M + m) * blockSize) =
-							getFromIdx(distSym[0], k + averagingBlockIdx * averagingBlockSize + m) *
-							getFromIdx(distSym[1], k + averagingBlockIdx * averagingBlockSize + n) *
-							std::conj(getFromIdx(distSym[1],
-												 k + averagingBlockIdx * averagingBlockSize + n + m));
+		for (int m = -M; m <= M; ++m)
+			for (int n = -M; n <= M; ++n)
+			{
+				Ux(k, M + n + (M + m) * blockSize) =
+						distSym[0][k + exclusionN + m] *
+						distSym[0][k + exclusionN + n] *
+						std::conj(distSym[0][k + exclusionN + n + m]);
+				Ux(k, blockSize * blockSize + M + n + (M + m) * blockSize) =
+						distSym[0][k + exclusionN + m] *
+						distSym[1][k + exclusionN + n] *
+						std::conj(distSym[1][k + exclusionN + n + m]);
 
-					Uy(k, M + n + (M + m) * blockSize) =
-							getFromIdx(distSym[1], k + averagingBlockIdx * averagingBlockSize + m) *
-							getFromIdx(distSym[1], k + averagingBlockIdx * averagingBlockSize + n) *
-							std::conj(getFromIdx(distSym[1],
-												 k + averagingBlockIdx * averagingBlockSize + n + m));
-					Uy(k, blockSize * blockSize + M + n + (M + m) * blockSize) =
-							getFromIdx(distSym[1], k + averagingBlockIdx * averagingBlockSize + m) *
-							getFromIdx(distSym[0], k + averagingBlockIdx * averagingBlockSize + n) *
-							std::conj(getFromIdx(distSym[0],
-												 k + averagingBlockIdx * averagingBlockSize + n + m));
-				}
-			dx[k] = refSym[0][k + averagingBlockIdx * averagingBlockSize];
-			dy[k] = refSym[1][k + averagingBlockIdx * averagingBlockSize];
-		}
-		//endregion
-
-		//region Least squares
-//		Eigen::MatrixXcd tmpcx =
-//				regularized<complex>(Ux.adjoint() * Ux).inverse() * Ux.adjoint() * dx;
-//		Eigen::MatrixXcd tmpcy =
-//				regularized<complex>(Uy.adjoint() * Uy).inverse() * Uy.adjoint() * dy;
-		Eigen::LeastSquaresConjugateGradient<Eigen::MatrixXcd> lscgx,lscgy;
-		lscgx.compute(Ux);
-		lscgy.compute(Uy);
-		cx = lscgx.solve(dx);
-		cy = lscgy.solve(dy);
-
-//		for (uint idx = 0; idx < 2 * blockSize * blockSize; ++idx)
-//		{
-//			cx(idx) = tmpcx(idx, 0);
-//			cy(idx) = tmpcy(idx, 0);
-//		}
-		//endregion
-
-		//region Model output
-		Eigen::VectorXcd yxVec = Ux * cx, yyVec = Uy * cy;
-		for (uint k = 0; k < averagingBlockSize; ++k)
-		{
-			yx[k + averagingBlockIdx * averagingBlockSize] = yxVec(k);
-			yy[k + averagingBlockIdx * averagingBlockSize] = yyVec(k);
-		}
-		//endregion
+				Uy(k, M + n + (M + m) * blockSize) =
+						distSym[1][k + exclusionN + m] *
+						distSym[1][k + exclusionN + n] *
+						std::conj(distSym[1][k + exclusionN + n + m]);
+				Uy(k, blockSize * blockSize + M + n + (M + m) * blockSize) =
+						distSym[1][k + exclusionN + m] *
+						distSym[0][k + exclusionN + n] *
+						std::conj(distSym[0][k + exclusionN + n + m]);
+			}
+		dx[k] = refSym[0][k + exclusionN] - distSym[0][k + exclusionN];
+		dy[k] = refSym[1][k + exclusionN] - distSym[1][k + exclusionN];
 	}
+	//endregion
+
+	//region Least squares
+//	Eigen::MatrixXcd tmpcx =
+//			regularized<complex>(Ux.adjoint() * Ux).inverse() * Ux.adjoint() * dx;
+//	Eigen::MatrixXcd tmpcy =
+//			regularized<complex>(Uy.adjoint() * Uy).inverse() * Uy.adjoint() * dy;
+//	for (uint idx = 0; idx < matrixSize; ++idx)
+//	{
+//		cx(idx) = tmpcx(idx, 0);
+//		cy(idx) = tmpcy(idx, 0);
+//	}
+	cx = regularized<complex>(Ux.adjoint() * Ux).inverse() * Ux.adjoint() * dx;
+	cy = regularized<complex>(Uy.adjoint() * Uy).inverse() * Uy.adjoint() * dy;
+//	Eigen::LeastSquaresConjugateGradient<Eigen::MatrixXcd> lscgx, lscgy;
+//	lscgx.compute(Ux);
+//	lscgy.compute(Uy);
+//	cx = lscgx.solve(dx);
+//	cy = lscgy.solve(dy);
+	//endregion
+
+	//region Model output
+	Eigen::VectorXcd yxVec = Ux * cx, yyVec = Uy * cy;
+	for (uint k = 0; k < N; ++k)
+	{
+		yx[k] = yxVec(k) + distSym[0][k + exclusionN];
+		yy[k] = yyVec(k) + distSym[1][k + exclusionN];
+	}
+	//endregion
+
 	iqPoints2Pol result{yx, yy};
 	return result;
 }
