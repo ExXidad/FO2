@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/FO2.dir/main.cpp.o"
+  "CMakeFiles/FO2.dir/main.cpp.o.d"
   "FO2"
   "FO2.pdb"
 )

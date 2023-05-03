@@ -8,89 +8,91 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/Users/xidad/CLionProjects/FO2/cmake-build-release"/>
+				<Option working_dir="/home/xidad/projects/FO2/cmake-build-release"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
-			<Target title="rebuild_cache">
-				<Option working_dir="/Users/xidad/CLionProjects/FO2/cmake-build-release"/>
-				<Option type="4"/>
-				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
-			<Target title="edit_cache">
-				<Option working_dir="/Users/xidad/CLionProjects/FO2/cmake-build-release"/>
-				<Option type="4"/>
-				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="FO2">
-				<Option output="/Users/xidad/CLionProjects/FO2/cmake-build-release/FO2" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/xidad/CLionProjects/FO2/cmake-build-release"/>
+				<Option output="/home/xidad/projects/FO2/cmake-build-release/FO2" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/xidad/projects/FO2/cmake-build-release"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add option="-DPROJECT_DIR_RAW=&quot;/Users/xidad/CLionProjects/FO2&quot;"/>
-					<Add directory="/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+					<Add option="-DPROJECT_DIR_RAW=&quot;/home/xidad/projects/FO2&quot;"/>
+					<Add directory="/home/xidad/libs/eigen-3.4.0"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
 					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
-					<Add directory="/System/Library/Frameworks"/>
-					<Add directory="/Library/Frameworks"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 FO2"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 FO2"/>
+					<CompileFile command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="FO2/fast">
-				<Option output="/Users/xidad/CLionProjects/FO2/cmake-build-release/FO2" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/xidad/CLionProjects/FO2/cmake-build-release"/>
+				<Option output="/home/xidad/projects/FO2/cmake-build-release/FO2" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/xidad/projects/FO2/cmake-build-release"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add option="-DPROJECT_DIR_RAW=&quot;/Users/xidad/CLionProjects/FO2&quot;"/>
-					<Add directory="/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+					<Add option="-DPROJECT_DIR_RAW=&quot;/home/xidad/projects/FO2&quot;"/>
+					<Add directory="/home/xidad/libs/eigen-3.4.0"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
 					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
-					<Add directory="/System/Library/Frameworks"/>
-					<Add directory="/Library/Frameworks"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 FO2/fast"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/xidad/CLionProjects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 FO2/fast"/>
+					<CompileFile command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/xidad/projects/FO2/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/xidad/projects/FO2/cmake-build-release"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j24 -f &quot;/home/xidad/projects/FO2/cmake-build-release/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/Users/xidad/CLionProjects/FO2/main.cpp">
+		<Unit filename="/home/xidad/projects/FO2/main.cpp">
 			<Option target="FO2"/>
 		</Unit>
-		<Unit filename="/Users/xidad/CLionProjects/FO2/utils.hpp">
+		<Unit filename="/home/xidad/projects/FO2/utils.hpp">
 			<Option target="FO2"/>
 		</Unit>
-		<Unit filename="/Users/xidad/CLionProjects/FO2/CMakeLists.txt">
+		<Unit filename="/home/xidad/projects/FO2/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

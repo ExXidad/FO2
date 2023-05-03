@@ -7,6 +7,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_definitions(-DPROJECT_DIR_RAW="${PROJECT_SOURCE_DIR}")
 
-include_directories(/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3)
+#include_directories(/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3)
+#include_directories(/usr/include/eigen3)
+include_directories(/home/xidad/libs/eigen-3.4.0/)
+#add_compile_options("-O3")
+
 
 add_executable(FO2 main.cpp utils.hpp)
